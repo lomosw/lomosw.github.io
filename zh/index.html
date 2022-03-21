@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Lomorage安装向导</title>
+  <link rel="icon" href="assets/images/favicon.png" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css?family=Karla:400,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.8.95/css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/css/bd-wizard.css">
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script src="assets/js/jquery.steps.min.js"></script>
+</head>
+<body>
+  <header>
+    <nav class="navbar navbar-expand-sm navbar-light bg-white">
+      <div class="container">
+        <a class="navbar-brand" href="#"><img src="assets/images/logo.png" alt="logo"></a>
+        <button class="navbar-toggler d-lg-none" type="button" data-toggle="collapse" data-target="#collapsibleNavId"
+          aria-controls="collapsibleNavId" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="collapsibleNavId">
+          <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="https://lomorage.com/zh">主页</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://lomorage.com/zh/faq/">常见问题</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="https://lomorage.com/zh/contact/">联系</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <main class="d-flex align-items-center">
+    <div class="container">
+        <div id="wizard">
+          <h3>第一步:安装Lomorage照片助手</h3>
+          <section>
+           <h5 class="bd-wizard-step-title">第一步</h5>
+           <h2 class="section-heading">安装Lomorage照片助手</h2>
+           <p>Lomorage照片助手是安装在电脑端的应用程序，照片助手可以让您通过无线传输的方式将手机上的照片无损的备份到电脑上，支持为多个家庭成员提供独立的账号和存储目录，并使用AI技术将您的照片按时间，地点，人物，场景进行分类管理。</p>
+           <p>Lomorage照片助手是跨平台应用，请选择您要安装的平台，如需安装到其他平台，请点击<a href="https://docs.lomorage.com/zh/docs/Installation/lomorage-service/">这里</a>：</p>
+           <div class="purpose-radios-wrapper">
+              <div class="purpose-radio">
+                 <input type="radio" name="server" id="windows" class="purpose-radio-input" value="Windows" checked>
+                 <label for="windows" class="purpose-radio-label">
+                   <span class="label-icon">
+                     <img src="assets/images/windows-logo.svg" alt="Windows" class="label-icon-default">
+                     <img src="assets/images/windows-logo.svg" alt="Windows" class="label-icon-active">
+                   </span>
+                   <span class="label-text">Windows</span>
+                 </label>
+                </div>
+                <div class="purpose-radio">
+                  <input type="radio" name="server" id="macos" class="purpose-radio-input" value="macOS">
+                  <label for="macos" class="purpose-radio-label">
+                    <span class="label-icon">
+                      <img src="assets/images/apple-logo.png" alt="macOS" class="label-icon-default">
+                      <img src="assets/images/apple-logo.png" alt="macOS" class="label-icon-active">
+                    </span>
+                    <span class="label-text">macOS</span>
+                  </label>
+                 </div>
+                 <!-- <div class="purpose-radio">
+                    <input type="radio" name="server" id="raspbian" class="purpose-radio-input" value="Raspbian">
+                    <label for="raspbian" class="purpose-radio-label">
+                      <span class="label-icon">
+                        <img src="assets/images/rpi-logo.png" alt="Raspbian" class="label-icon-default">
+                        <img src="assets/images/rpi-logo.png" alt="Raspbian" class="label-icon-active">
+                      </span>
+                      <span class="label-text">Raspbian</span>
+                    </label>
+                 </div>
+                 <div class="purpose-radio">
+                    <input type="radio" name="server" id="docker" class="purpose-radio-input" value="Docker">
+                    <label for="docker" class="purpose-radio-label">
+                      <span class="label-icon">
+                        <img src="assets/images/docker-logo.png" alt="Docker" class="label-icon-default">
+                        <img src="assets/images/docker-logo.png" alt="Docker" class="label-icon-active">
+                      </span>
+                      <span class="label-text">Docker</span>
+                    </label>
+                 </div>
+                 <div class="purpose-radio">
+                    <input type="radio" name="server" id="armbian" class="purpose-radio-input" value="Armbian">
+                    <label for="armbian" class="purpose-radio-label">
+                      <span class="label-icon">
+                        <img src="assets/images/armbian-logo.png" alt="Armbian" class="label-icon-default">
+                        <img src="assets/images/armbian-logo.png" alt="Armbian" class="label-icon-active">
+                      </span>
+                      <span class="label-text">Armbian</span>
+                    </label>
+                 </div>
+                 <div class="purpose-radio">
+                    <input type="radio" name="server" id="ubuntu" class="purpose-radio-input" value="Ubuntu">
+                    <label for="ubuntu" class="purpose-radio-label">
+                      <span class="label-icon">
+                        <img src="assets/images/ubuntu-logo.png" alt="Ubuntu" class="label-icon-default">
+                        <img src="assets/images/ubuntu-logo.png" alt="Ubuntu" class="label-icon-active">
+                      </span>
+                      <span class="label-text">Ubuntu</span>
+                    </label>
+                 </div>
+                 <div class="purpose-radio">
+                    <input type="radio" name="server" id="unraid" class="purpose-radio-input" value="Unraid">
+                    <label for="unraid" class="purpose-radio-label">
+                      <span class="label-icon">
+                        <img src="assets/images/unraid-logo.png" alt="Unraid" class="label-icon-default">
+                        <img src="assets/images/unraid-logo.png" alt="Unraid" class="label-icon-active">
+                      </span>
+                      <span class="label-text">Unraid</span>
+                    </label>
+                 </div>
+                 <div class="purpose-radio">
+                    <input type="radio" name="server" id="openwrt" class="purpose-radio-input" value="OpenWrt">
+                    <label for="openwrt" class="purpose-radio-label">
+                      <span class="label-icon">
+                        <img src="assets/images/openwrt-logo.png" alt="OpenWrt" class="label-icon-default">
+                        <img src="assets/images/openwrt-logo.png" alt="OpenWrt" class="label-icon-active">
+                      </span>
+                      <span class="label-text">OpenWrt</span>
+                    </label>
+                 </div> -->
+           </div>
+           <div id="server-install">
+           </div>
+          </section>
+          <h3>第二步：安装Lomorage手机应用</h3>
+          <section>
+            <h5 class="bd-wizard-step-title">第二步</h5>
+            <h2 class="section-heading">安装Lomorage手机应用</h2>
+            <p>Lomorage手机应用程序，可以非常方便的将您手机里的照片通过无线方式，无损的备份到您自己的电脑上，并智能分类管理，无限账号，随时查看，杜绝隐私泄露。</p>
+            <p>安装手机应用前，请先确保"Lomorage照片助手"已经运行，并且和手机在同一个网络中。</p>
+            <div class="purpose-radios-wrapper">
+              <div class="purpose-radio">
+                 <input type="radio" name="client" id="android" class="purpose-radio-input" value="Android" checked>
+                 <label for="android" class="purpose-radio-label">
+                   <span class="label-icon">
+                     <img src="assets/images/android.png" alt="Android" class="label-icon-default">
+                     <img src="assets/images/android.png" alt="Android" class="label-icon-active">
+                   </span>
+                   <span class="label-text">Android</span>
+                 </label>
+                </div>
+                <div class="purpose-radio">
+                  <input type="radio" name="client" id="ios" class="purpose-radio-input" value="iOS">
+                  <label for="ios" class="purpose-radio-label">
+                    <span class="label-icon">
+                      <img src="assets/images/apple-logo.png" alt="iOS" class="label-icon-default">
+                      <img src="assets/images/apple-logo.png" alt="iOS" class="label-icon-active">
+                    </span>
+                    <span class="label-text">iOS</span>
+                  </label>
+                 </div>
+                 <div id="client-install"></div>
+            </div>
+          </section>
+          <h3>第三步：导入已有的照片（可选）</h3>
+          <section>
+              <h5 class="bd-wizard-step-title">第三步</h5>
+              <h2 class="section-heading mb-5">导入已有的照片（可选）</h2>
+<!-- 
+              <div class="embed-responsive embed-responsive-16by9" id="server-install">
+                <iframe class="embed-responsive-item" src="https://docs.lomorage.com/zh/docs/Installation/lomorage-service/installation-win/">
+                </iframe>
+              </div> -->
+
+              <p>
+                Lomorage导入工具可以将存储在硬盘或其他地方的的照片视频导入到系统，提供统一管理；导入后，您也可以在手机上查看导入后的照片和视频。           
+                目前该工具支持Windows和macOS。
+              </p>
+
+              <div class="purpose-radios-wrapper">
+                <div class="purpose-radio">
+                   <input type="radio" name="import" id="windows-import" class="purpose-radio-input" value="Windows" checked>
+                   <label for="windows-import" class="purpose-radio-label">
+                     <span class="label-icon">
+                       <img src="assets/images/windows-logo.svg" alt="Windows" class="label-icon-default">
+                       <img src="assets/images/windows-logo.svg" alt="Windows" class="label-icon-active">
+                     </span>
+                     <span class="label-text">Windows</span>
+                   </label>
+                  </div>
+                  <div class="purpose-radio">
+                    <input type="radio" name="import" id="macos-import" class="purpose-radio-input" value="macOS">
+                    <label for="macos-import" class="purpose-radio-label">
+                      <span class="label-icon">
+                        <img src="assets/images/apple-logo.png" alt="macOS" class="label-icon-default">
+                        <img src="assets/images/apple-logo.png" alt="macOS" class="label-icon-active">
+                      </span>
+                      <span class="label-text">macOS</span>
+                    </label>
+                   </div>
+             </div>
+             <div id="import-install">
+             </div>
+
+          </section>
+        </div>
+    </div>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+  <script src="assets/js/bd-wizard.js"></script>
+</body>
+</html>

@@ -38,6 +38,8 @@ $('input:radio[name=server]').on('change', function(e) {
         insertHtml("#server-install", "windows.html");
     } else if (e.target.value == "macOS") {
         insertHtml("#server-install", "macOS.html");
+    } else if (e.target.value == "others") {
+        insertHtml("#server-install", "other-platforms.html");
     }
 });
 

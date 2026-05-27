@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lomorage Promo Poster (English)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #0c1b33;
+      --primary-color: #00d2ff;
+      --secondary-color: #00f2fe;
+      --text-main: #ffffff;
+      --text-sub: #aed8f2;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      width: 800px;
+      height: 1200px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Poster Background */
+    .poster-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('en/assets/images/lomorage-promo-poster.png');
+      background-size: cover;
+      background-position: center;
+      z-index: 1;
+      filter: brightness(0.85) contrast(1.05);
+    }
+
+    /* Gradient overlay for text legibility */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, rgba(12, 27, 51, 0.8) 0%, rgba(12, 27, 51, 0.4) 30%, rgba(12, 27, 51, 0.5) 60%, rgba(12, 27, 51, 0.92) 100%);
+      z-index: 2;
+    }
+
+    /* Content container */
+    .content {
+      position: relative;
+      z-index: 3;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 60px 50px 50px 50px;
+    }
+
+    /* Header Area */
+    .header {
+      text-align: center;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+
+    .logo-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 28px;
+      color: #0c1b33;
+      box-shadow: 0 0 20px rgba(0, 210, 255, 0.5);
+    }
+
+    .brand-name {
+      font-size: 42px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      background: linear-gradient(to right, #ffffff, #00d2ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .slogan {
+      font-size: 20px;
+      color: var(--text-sub);
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-top: 8px;
+    }
+
+    /* Features Section */
+    .features {
+      margin-top: 150px;
+      display: flex;
+      flex-direction: column;
+      gap: 35px;
+      max-width: 540px;
+    }
+
+    .feature-card {
+      background: rgba(12, 27, 51, 0.65);
+      border-left: 5px solid var(--primary-color);
+      padding: 20px 25px;
+      border-radius: 0 16px 16px 0;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .feature-title span {
+      color: var(--primary-color);
+    }
+
+    .feature-desc {
+      font-size: 14px;
+      color: var(--text-sub);
+      line-height: 1.6;
+    }
+
+    /* Footer Section */
+    .footer {
+      background: rgba(8, 18, 36, 0.9);
+      border: 1px solid rgba(0, 210, 255, 0.2);
+      border-radius: 20px;
+      padding: 25px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .event-info {
+      flex: 1;
+      padding-right: 30px;
+    }
+
+    .event-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #ff416c, #ff4b2b);
+      color: #ffffff;
+      padding: 6px 14px;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 30px;
+      margin-bottom: 12px;
+      box-shadow: 0 5px 15px rgba(255, 75, 43, 0.4);
+    }
+
+    .event-desc {
+      font-size: 13px;
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    .event-desc strong {
+      color: var(--primary-color);
+    }
+
+    .qrcodes {
+      display: flex;
+      gap: 20px;
+    }
+
+    .qrcode-wrapper {
+      text-align: center;
+    }
+
+    .qrcode-box {
+      width: 110px;
+      height: 110px;
+      background-color: #ffffff;
+      padding: 6px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0, 210, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qrcode-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .qrcode-label {
+      font-size: 10px;
+      color: var(--text-sub);
+      margin-top: 8px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Image & Overlay -->
+  <div class="poster-bg"></div>
+  <div class="overlay"></div>
+
+  <!-- Content Layout -->
+  <div class="content">
+    
+    <!-- 1. Header Logo & Title -->
+    <div class="header">
+      <div class="logo-container">
+        <div class="logo-icon">L</div>
+        <div class="brand-name">Lomorage</div>
+      </div>
+      <div class="slogan">Your Family Private Photo Cloud</div>
+    </div>
+
+    <!-- 2. Core Value Cards -->
+    <div class="features">
+      
+      <div class="feature-card">
+        <div class="feature-title"><span>●</span> No Subscription Fees, Lifetime Use</div>
+        <div class="feature-desc">No yearly iCloud or cloud drive bills. Photos and videos are stored in your own hardware, with storage size fully in your control.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-title"><span>●</span> 100% Privacy & LAN High-Speed Sync</div>
+        <div class="feature-desc">No third-party cloud uploads. All photos sync securely and directly to your local hard drive over Wi-Fi. Your private data stays completely private.</div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-title"><span>●</span> Native Live Photos Backup</div>
+        <div class="feature-desc">Flawlessly packages Apple Live Photos (retaining both dynamic motion and sound) into standard ZIP archives in original quality. Never lose your most vivid memories.</div>
+      </div>
+
+    </div>
+
+    <!-- 3. Footer Event & QR Codes -->
+    <div class="footer">
+      <div class="event-info">
+        <span class="event-badge">Official Offer</span>
+        <div class="event-desc">
+          Scan the QR codes to get Lomorage from the App Store.<br/>
+          <strong>【Limited-Time Free Offer】</strong>: Share this poster to Twitter, Reddit, or NAS/tech communities, send the screenshot to Lomorage support to receive an official App download redeem code for free! Limited to 100 copies.
+        </div>
+      </div>
+      
+      <div class="qrcodes">
+        <div class="qrcode-wrapper">
+          <div class="qrcode-box">
+            <img class="qrcode-img" src="en/assets/images/ios-appstore-qrcode.png" alt="iOS QR">
+          </div>
+          <div class="qrcode-label">Get iOS App</div>
+        </div>
+        <div class="qrcode-wrapper">
+          <div class="qrcode-box">
+            <img class="qrcode-img" src="en/assets/images/google-play-qrcode.png" alt="Google Play QR">
+          </div>
+          <div class="qrcode-label">Get Android App</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

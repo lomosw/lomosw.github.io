@@ -42,6 +42,18 @@
 
 .PARAMETER NoBrowser
   Skip auto-opening the default browser to the local setup UI after install.
+
+.NOTES
+  Set $env:LOMOD_CHINA=1 before running to fetch the release zip through
+  https://gfw.lomorage.com/<url> instead of directly from GitHub Releases -- same accelerator
+  proxy already used for the zh download links on lomosw.github.io (LomoAgentWin/LomoAgentOSX/
+  Android/pi-gen etc), since GitHub Releases asset downloads are often slow or unreachable from
+  mainland China otherwise. Only the zip download is affected -- the release manifest fetch
+  (-ReleaseUrl) already goes to lomorage.com's own domain, not GitHub. An env var rather than a
+  -China switch because this script is normally invoked as `irm ... | iex`, which has no way to
+  pass switch/positional arguments through the pipe; an env var set beforehand is visible to the
+  script once iex evaluates it in the current scope:
+      $env:LOMOD_CHINA=1; irm https://lomosw.lomorage.com/windows/install.ps1 | iex
 #>
 param(
     [string]$InstallDir = (Join-Path $env:LOCALAPPDATA "Lomorage\lomod"),
@@ -53,6 +65,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$China = $env:LOMOD_CHINA -eq "1"
 
 function Write-Step($msg) { Write-Host "==> $msg" -ForegroundColor Cyan }
 function Write-Warn2($msg) { Write-Host "!! $msg" -ForegroundColor Yellow }
@@ -140,9 +153,10 @@ try {
 
     Stop-ExistingLomod
 
-    Write-Step "Downloading lomod $($platform.Version)"
+    $downloadUrl = if ($China) { "https://gfw.lomorage.com/$($platform.URL)" } else { $platform.URL }
+    Write-Step "Downloading lomod $($platform.Version)$(if ($China) { ' via gfw.lomorage.com proxy' })"
     $tmpZip = Join-Path $env:TEMP "lomorage-windows-$($platform.Version).zip"
-    Get-VerifiedFile -Url $platform.URL -ExpectedSha256 $platform.SHA256 -OutFile $tmpZip
+    Get-VerifiedFile -Url $downloadUrl -ExpectedSha256 $platform.SHA256 -OutFile $tmpZip
 
     Write-Step "Installing to $InstallDir"
     New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null

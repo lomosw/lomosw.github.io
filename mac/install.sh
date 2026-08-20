@@ -38,6 +38,18 @@
 #                           macos-cli-arm64 or macos-cli-amd64, chosen from `uname -m`.
 #   --port <port>          Default: 8000
 #   --no-browser           Skip auto-opening the default browser to the local setup UI after install.
+#
+# LOMOD_CHINA=1  Route the release tarball download through https://gfw.lomorage.com/<url>
+#                instead of directly from GitHub Releases -- same accelerator proxy already used
+#                for the zh download links on lomosw.github.io (LomoAgentWin/LomoAgentOSX/
+#                Android/pi-gen etc), since GitHub Releases asset downloads are often slow or
+#                unreachable from mainland China otherwise. Mirrors installers/windows/
+#                install.ps1's $env:LOMOD_CHINA. Only the tarball download is affected -- the
+#                release manifest fetch (--release-url) already goes to lomorage.com's own
+#                domain, not GitHub. No --china flag (env var only): this script is normally
+#                invoked as `curl | bash`, which has no clean way to pass flags through the pipe,
+#                but a var set on the right-hand command of a pipeline is visible to it:
+#                    curl -fsSL https://lomosw.lomorage.com/mac/install.sh | LOMOD_CHINA=1 bash
 set -euo pipefail
 
 INSTALL_DIR="${INSTALL_DIR:-${HOME}/Library/Application Support/Lomorage/lomod}"
@@ -46,6 +58,7 @@ RELEASE_URL="${RELEASE_URL:-https://lomorage.com/release.json}"
 MANIFEST_KEY="${MANIFEST_KEY:-}"
 PORT="${PORT:-8000}"
 NO_BROWSER="${NO_BROWSER:-}"
+CHINA="${LOMOD_CHINA:-}"
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -164,11 +177,18 @@ PLATFORM_VERSION="$(manifest_field Version)" || fail "release manifest entry '${
 
 stop_existing_lomod
 
-step "Downloading lomod ${PLATFORM_VERSION}"
+DOWNLOAD_URL="${PLATFORM_URL}"
+CHINA_SUFFIX=""
+if [[ -n "${CHINA}" ]]; then
+    DOWNLOAD_URL="https://gfw.lomorage.com/${PLATFORM_URL}"
+    CHINA_SUFFIX=" via gfw.lomorage.com proxy"
+fi
+
+step "Downloading lomod ${PLATFORM_VERSION}${CHINA_SUFFIX}"
 TMP_DIR="$(mktemp -d -t lomorage-macos)"
 trap 'rm -rf "${TMP_DIR}"' EXIT
 TMP_TARBALL="${TMP_DIR}/lomorage-macos-${PLATFORM_VERSION}.tar.gz"
-curl -fsSL -o "${TMP_TARBALL}" "${PLATFORM_URL}" || fail "download of ${PLATFORM_URL} failed"
+curl -fsSL -o "${TMP_TARBALL}" "${DOWNLOAD_URL}" || fail "download of ${DOWNLOAD_URL} failed"
 
 # lowercase via tr, not bash 4's ${var,,}: macOS ships bash 3.2 (Apple stopped updating bash
 # at the last GPLv2 release), which doesn't support that expansion.

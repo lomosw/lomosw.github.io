@@ -1,17 +1,15 @@
 <br/>
-<h4>点击<a href="https://gfw.lomorage.com/https://github.com/lomorage/LomoAgentWin/releases/download/zh/lomoagent.msi">这里</a>下载Lomorage照片助手。</h4>
+<h4>打开 PowerShell（不需要管理员权限），粘贴执行：</h4>
 
 <br/>
-<p>下载安装完后，启动应用，设置好照片存储的主目录，然后点击“启动”按钮。</p>
+<code style="display:inline-block; margin-top:4px; padding:4px 8px; background:#f4f4f4; border-radius:4px;">$env:LOMOD_CHINA=1; irm https://lomosw.lomorage.com/windows/install.ps1 | iex</code>
 
-<br/>
-<img style="max-width:100%; object-fit: contain;" src="https://docs.lomorage.com/img/installation/windows-lomo-agent-zh.png" alt="设置存储目录">
+<br/><br/>
+<p>这会把"Lomorage"自动安装到你的用户目录下并启动——没有安装向导窗口，不需要重启电脑。"开始"菜单和系统托盘都会出现"Lomorage"图标，随时可以从这两个地方打开它。它每天会自动检查并安装新版本，不需要任何操作。</p>
+
+<p>更多细节（自定义数据目录、手机访问、卸载等）请参考<a href="https://docs.lomorage.com/zh/docs/Installation/lomorage-service/installation-win/">完整安装文档</a>。</p>
 
 <hr/>
 <p style="font-size:0.9em; color:#666;">
-  <strong>高级选项：</strong>喜欢用命令行？打开 PowerShell 并运行：
-  <br/>
-  <code style="display:inline-block; margin-top:4px; padding:4px 8px; background:#f4f4f4; border-radius:4px;">$env:LOMOD_CHINA=1; irm https://lomosw.lomorage.com/windows/install.ps1 | iex</code>
-  <br/>
-  这将只安装 lomod 后端服务（无图形界面）到你的用户目录下，无需管理员权限。下载安装包时会走 gfw.lomorage.com 加速代理。
+  <strong>其他选择：</strong>更喜欢传统的图形化安装向导？<a href="https://gfw.lomorage.com/https://github.com/lomorage/LomoAgentWin/releases/download/zh/lomoagent.msi">下载 MSI 安装包</a>。
 </p>

@@ -1,17 +1,15 @@
 <br/>
-<h4>Click <a href="https://github.com/lomorage/LomoAgentWin/releases/download/en/lomoagent.msi">here</a> to download "Lomorage Photo Assistant".</h4>
+<h4>Open PowerShell (no admin rights needed) and run:</h4>
 
 <br/>
-<p>Once downloaded and installed, run "Lomorage Photo Assistant", and set the directory to store the photos, then click "Start" button.</p>
+<code style="display:inline-block; margin-top:4px; padding:4px 8px; background:#f4f4f4; border-radius:4px;">irm https://lomosw.lomorage.com/windows/install.ps1 | iex</code>
 
-<br/>
-<img style="max-width:100%; object-fit: contain;" src="https://docs.lomorage.com/img/installation/windows-lomo-agent.png" alt="Store Directory Setting">
+<br/><br/>
+<p>This installs "Lomorage" to your user profile and starts it automatically -- no installer window, no reboot. A "Lomorage" icon appears in your Start menu and system tray; open it from either any time. It checks for and installs updates automatically once a day.</p>
+
+<p>See the <a href="https://docs.lomorage.com/docs/Installation/lomorage-service/installation-win/">full install guide</a> for details -- choosing a custom data folder, accessing it from your phone, uninstalling, and more.</p>
 
 <hr/>
 <p style="font-size:0.9em; color:#666;">
-  <strong>Advanced:</strong> prefer the command line? Open PowerShell and run:
-  <br/>
-  <code style="display:inline-block; margin-top:4px; padding:4px 8px; background:#f4f4f4; border-radius:4px;">irm https://lomosw.lomorage.com/windows/install.ps1 | iex</code>
-  <br/>
-  This installs just the lomod backend (no GUI) to your user profile, no admin rights required.
+  <strong>Alternative:</strong> prefer a traditional installer with a GUI setup wizard instead? <a href="https://github.com/lomorage/LomoAgentWin/releases/download/en/lomoagent.msi">Download the MSI installer</a>.
 </p>

@@ -259,6 +259,17 @@ This could mean a corrupted download or a tampered release -- aborting."
 fi
 
 step "Installing to ${INSTALL_DIR}"
+# Wipe before extracting, not just overwrite in place: INSTALL_DIR holds only program files
+# (lomod and its bundled deps) never user data (that's DATA_DIR, a separate location), so
+# nothing of value is lost -- but tar extracting into an already-populated directory leaves
+# behind any file that existed in an older release and doesn't exist in the new one. That's
+# usually harmless, except for a signed bundle like Lomorage.app: an older release's signature
+# scheme can leave stray files (e.g. detached Contents/_CodeSignature/CodeDirectory et al,
+# from back when lomorage-launcher was a shell script instead of a compiled binary) sitting
+# alongside the new release's differently-shaped signature, which Gatekeeper then rejects
+# wholesale as "unsealed contents present in the bundle root" -- macOS shows that to the user
+# as a confusing, unrelated-looking "\"Lomorage\" is damaged and can't be opened" dialog.
+rm -rf "${INSTALL_DIR}"
 mkdir -p "${INSTALL_DIR}"
 tar -xzf "${TMP_TARBALL}" -C "${INSTALL_DIR}"
 chmod +x "${INSTALL_DIR}/lomod" "${INSTALL_DIR}/lomorage-start.sh" "${INSTALL_DIR}/lomorage-stop.sh"

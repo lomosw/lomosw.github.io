@@ -4,7 +4,7 @@
 #
 # Intended to be run the same way Claude Code's own installer is:
 #
-#     curl -fsSL https://lomosw.lomorage.com/macos/install.sh | bash
+#     curl -fsSL https://lomosw.lomorage.com/mac/install.sh | bash
 #
 # This is a secondary, advanced/CLI install path -- mirrors installers/windows/install.ps1.
 # The primary recommended macOS install is still the LomoAgent GUI installer (LomoAgentOSX,

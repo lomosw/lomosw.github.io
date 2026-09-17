@@ -8,8 +8,10 @@
 #
 # This is a secondary, advanced/CLI install path -- mirrors installers/windows/install.ps1.
 # The primary recommended macOS install is still the LomoAgent GUI installer (LomoAgentOSX,
-# see en/mac.html on lomosw.github.io); this script installs the bare lomod backend with no
-# GUI/tray/onboarding, for users who'd rather script it.
+# see en/mac.html on lomosw.github.io); this script installs the bare lomod backend, with no
+# GUI onboarding, for users who'd rather script it. It does come with a menu bar icon
+# (lomorage-tray.js, a JXA/osascript script -- see its own header comment) mirroring the
+# Windows installer's system tray icon, for open/start/stop/restart/reset without a terminal.
 #
 # Everything here runs at the current user's permission level -- no sudo, no admin rights, no
 # system LaunchDaemon. It installs into ~/Library/Application Support, autostarts via a
@@ -127,6 +129,21 @@ stop_existing_lomod() {
 
 register_autostart() {
     mkdir -p "$(dirname "${PLIST_PATH}")"
+    # Prefer launching the menu bar tray (it starts lomod itself on launch -- see
+    # lomorage-tray.js's header comment) so a single autostart entry brings back both the icon
+    # and the server; fall back to starting lomod directly, headless, if the tray script is
+    # missing (e.g. an older release tarball extracted over a partial/interrupted install).
+    if [[ -f "${INSTALL_DIR}/lomorage-tray.js" ]]; then
+        PROGRAM_ARGUMENTS="<string>/usr/bin/osascript</string>
+        <string>-l</string>
+        <string>JavaScript</string>
+        <string>${INSTALL_DIR}/lomorage-tray.js</string>
+        <string>${INSTALL_DIR}</string>"
+        PROCESS_TYPE="Interactive"
+    else
+        PROGRAM_ARGUMENTS="<string>${INSTALL_DIR}/lomorage-start.sh</string>"
+        PROCESS_TYPE="Background"
+    fi
     cat > "${PLIST_PATH}" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -136,14 +153,14 @@ register_autostart() {
     <string>${LABEL}</string>
     <key>ProgramArguments</key>
     <array>
-        <string>${INSTALL_DIR}/lomorage-start.sh</string>
+        ${PROGRAM_ARGUMENTS}
     </array>
     <key>RunAtLoad</key>
     <true/>
     <key>KeepAlive</key>
     <false/>
     <key>ProcessType</key>
-    <string>Background</string>
+    <string>${PROCESS_TYPE}</string>
 </dict>
 </plist>
 PLIST
@@ -152,10 +169,15 @@ PLIST
 }
 
 wait_for_lomod() {
+    # No -f: a fresh, not-yet-onboarded lomod legitimately answers /mount with a 500
+    # ("Device is not mounted yet") until the user finishes the /welcome setup flow in the
+    # browser -- -f would treat that as a failed health check even though the server is up and
+    # responding correctly. Without -f, curl still exits non-zero for an actual connection
+    # failure (nothing listening yet, timeout), which is the only thing this loop needs to poll.
     local timeout=30 start_ts now_ts
     start_ts="$(date +%s)"
     while true; do
-        if curl -fsS -o /dev/null --max-time 2 "http://127.0.0.1:${PORT}/mount" 2>/dev/null; then
+        if curl -sS -o /dev/null --max-time 2 "http://127.0.0.1:${PORT}/mount" 2>/dev/null; then
             return 0
         fi
         now_ts="$(date +%s)"
@@ -205,6 +227,7 @@ step "Installing to ${INSTALL_DIR}"
 mkdir -p "${INSTALL_DIR}"
 tar -xzf "${TMP_TARBALL}" -C "${INSTALL_DIR}"
 chmod +x "${INSTALL_DIR}/lomod" "${INSTALL_DIR}/lomorage-start.sh" "${INSTALL_DIR}/lomorage-stop.sh"
+[[ -f "${INSTALL_DIR}/lomorage-tray.js" ]] && chmod +x "${INSTALL_DIR}/lomorage-tray.js"
 
 printf '%s' "${PLATFORM_VERSION}" > "${INSTALL_DIR}/version.txt"
 
@@ -223,7 +246,11 @@ if wait_for_lomod; then
     echo "  install dir: ${INSTALL_DIR}"
     echo "  data dir:    ${DATA_DIR}"
     echo "  it will start automatically next time you log in"
-    echo "  to stop it, run: ${INSTALL_DIR}/lomorage-stop.sh"
+    if [[ -f "${INSTALL_DIR}/lomorage-tray.js" ]]; then
+        echo "  a Lomorage icon is in the menu bar -- use it to open/stop/restart/reset"
+    else
+        echo "  to stop it, run: ${INSTALL_DIR}/lomorage-stop.sh"
+    fi
     if [[ -z "${NO_BROWSER}" ]]; then
         open "http://localhost:${PORT}" || true
     fi

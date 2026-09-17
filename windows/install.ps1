@@ -14,12 +14,15 @@
   Everything here runs at the current user's permission level -- no UAC prompt, no admin
   rights, no Windows Service. It installs into %LOCALAPPDATA%, autostarts via a shortcut in
   the per-user Startup folder (not the Windows Service Control Manager or an elevated
-  Scheduled Task, both of which require elevation), and defaults to a single local backup
-  folder with mDNS disabled so first run doesn't trigger a Windows Firewall prompt.
+  Scheduled Task, both of which require elevation), adds a Start Menu shortcut too (so
+  reopening it after a Quit is "search Lomorage, press Enter" -- no PowerShell, no hunting
+  through %LOCALAPPDATA%, same as any other installed app), and defaults to a single local
+  backup folder with mDNS disabled so first run doesn't trigger a Windows Firewall prompt.
 
   Safe to re-run: it stops any already-running lomod.exe, replaces the install directory, and
-  restarts it, so this script also serves as a manual repair/reinstall/update path pending a
-  scheduled self-update wired on top of cmd/lomoupg.
+  restarts it, so this script also serves as a manual repair/reinstall/update path. A daily,
+  per-user Scheduled Task (see Register-Autoupdate / lomorage-update.ps1) additionally checks
+  for and installs new releases automatically, no admin rights required.
 
 .PARAMETER InstallDir
   Where lomod.exe and its bundled dependencies (vips DLLs, exiftool.exe, ffmpeg.exe/ffprobe.exe)
@@ -110,18 +113,76 @@ function Stop-ExistingLomod {
     }
 }
 
-function Register-Autostart {
-    $startupDir = [Environment]::GetFolderPath("Startup")
-    $shortcutPath = Join-Path $startupDir "Lomorage.lnk"
-    $target = Join-Path $InstallDir "lomorage-start.bat"
+function New-LomorageShortcut {
+    # Shared by Register-Autostart and Register-StartMenuShortcut: both point at
+    # lomorage-tray.ps1, not lomorage-start.bat directly, since the tray script starts
+    # lomod.exe itself (if not already running) and also puts a notification-area icon up with
+    # Open/Start/Stop/Restart, so one shortcut covers both "run automatically" and "reopen it by
+    # hand" -- neither needs to know or care whether lomod is already running.
+    # lomorage-start.bat still exists unchanged for lomoupg's --precmd/--postcmd self-update
+    # hooks, which don't go through this at all.
+    param([string]$Path, [string]$Description)
 
     $shell = New-Object -ComObject WScript.Shell
-    $shortcut = $shell.CreateShortcut($shortcutPath)
-    $shortcut.TargetPath = $target
+    $shortcut = $shell.CreateShortcut($Path)
+    $shortcut.TargetPath = (Get-Command powershell.exe).Source
+    $shortcut.Arguments = "-WindowStyle Hidden -ExecutionPolicy Bypass -File `"$(Join-Path $InstallDir 'lomorage-tray.ps1')`""
     $shortcut.WorkingDirectory = $InstallDir
-    $shortcut.WindowStyle = 7  # minimized
-    $shortcut.Description = "Start lomorage photo backup"
+    $shortcut.WindowStyle = 7  # minimized (only matters for the brief instant before -WindowStyle Hidden takes over)
+    $shortcut.Description = $Description
+    $iconPath = Join-Path $InstallDir "lomorage.ico"
+    if (Test-Path $iconPath) { $shortcut.IconLocation = $iconPath }
     $shortcut.Save()
+}
+
+function Register-Autostart {
+    $startupDir = [Environment]::GetFolderPath("Startup")
+    New-LomorageShortcut -Path (Join-Path $startupDir "Lomorage.lnk") `
+        -Description "Lomorage tray icon (starts lomod, lets you open/stop/restart it)"
+}
+
+function Register-StartMenuShortcut {
+    # A non-technical user's actual path back into the app once the tray icon is gone --
+    # Quit in the tray menu closes it with no other visible trace, and the Startup-folder
+    # shortcut Register-Autostart makes is deliberately hidden (that's the point of an
+    # autostart entry). Windows key -> type "Lomorage" -> Enter is the one launch path every
+    # Windows user already knows, same as any other installed app -- no PowerShell, no
+    # digging through %LOCALAPPDATA%, no remembering a .bat filename.
+    $startMenuDir = [Environment]::GetFolderPath("Programs")
+    New-LomorageShortcut -Path (Join-Path $startMenuDir "Lomorage.lnk") `
+        -Description "Open Lomorage (starts it if it isn't already running)"
+}
+
+function Register-Autoupdate {
+    # Per-user, non-admin Scheduled Task -- LogonType Interactive + RunLevel Limited is exactly
+    # what a standard user can already do at their own privilege level, same as everything else
+    # in this script; it does not need (and will not prompt for) elevation.
+    $taskName = "LomorageUpdate"
+    $updateScript = Join-Path $InstallDir "lomorage-update.ps1"
+
+    $action = New-ScheduledTaskAction -Execute "powershell.exe" `
+        -Argument "-WindowStyle Hidden -ExecutionPolicy Bypass -File `"$updateScript`""
+
+    # Daily only -- no AtLogOn trigger: tested on this machine, adding one makes
+    # Register-ScheduledTask fail with a bare "Access is denied" regardless of Principal/
+    # RunLevel (looks like local policy blocking logon-triggered task creation without
+    # elevation, a common anti-persistence hardening setting -- Daily triggers aren't
+    # affected). -StartWhenAvailable below covers most of the same gap: a laptop that's
+    # asleep at 3:15am runs the missed trigger as soon as it's next on, not just next login.
+    $dailyTrigger = New-ScheduledTaskTrigger -Daily -At "3:15AM"
+    $dailyTrigger.RandomDelay = "PT30M"
+
+    # DOMAIN\User (or COMPUTERNAME\User), not a bare username: Register-ScheduledTask fails
+    # with a bare "Access is denied" against just $env:USERNAME.
+    $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Limited
+    $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -RunOnlyIfNetworkAvailable `
+        -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
+
+    Unregister-ScheduledTask -TaskName $taskName -Confirm:$false -ErrorAction SilentlyContinue
+    Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $dailyTrigger `
+        -Principal $principal -Settings $settings `
+        -Description "Checks for and installs lomod CLI updates (lomorage-update.ps1). Per-user, no admin rights." `
+        | Out-Null
 }
 
 function Wait-ForLomod {
@@ -171,13 +232,20 @@ try {
 
     Write-Step "Registering autostart (per-user, no admin required)"
     Register-Autostart
+    Register-StartMenuShortcut
 
-    Write-Step "Starting lomod"
-    # No -Wait: cmd.exe here just runs `start ... lomod.exe` and exits almost immediately, but
-    # Start-Process -Wait has a known quirk of blocking on further-detached grandchildren too
-    # (lomod.exe itself keeps running) -- confirmed by lomod already answering HTTP requests while
-    # -Wait was still blocked. Wait-ForLomod below is the actual readiness signal we need anyway.
-    Start-Process -FilePath "cmd.exe" -ArgumentList "/c", "`"$(Join-Path $InstallDir 'lomorage-start.bat')`"" -WindowStyle Hidden
+    Write-Step "Registering daily auto-update check (per-user, no admin required)"
+    try {
+        Register-Autoupdate
+    } catch {
+        Write-Warn2 "Could not register the auto-update Scheduled Task: $($_.Exception.Message). lomod will still run fine -- re-run this installer manually to update."
+    }
+
+    Write-Step "Starting lomod and the tray icon"
+    # No -Wait: this launches the tray script (which starts lomod.exe itself) and returns
+    # immediately -- both processes keep running detached. Wait-ForLomod below is the actual
+    # readiness signal we need anyway.
+    Start-Process -FilePath "powershell.exe" -ArgumentList "-WindowStyle", "Hidden", "-ExecutionPolicy", "Bypass", "-File", "`"$(Join-Path $InstallDir 'lomorage-tray.ps1')`"" -WindowStyle Hidden
 
     if (Wait-ForLomod) {
         Write-Host ""
@@ -185,7 +253,8 @@ try {
         Write-Host "  install dir: $InstallDir"
         Write-Host "  data dir:    $DataDir"
         Write-Host "  it will start automatically next time you log in"
-        Write-Host "  to stop it, run: $InstallDir\lomorage-stop.bat"
+        Write-Host "  to reopen it by hand: search for 'Lomorage' in the Start menu"
+        Write-Host "  to stop it: right-click the Lomorage tray icon and choose Stop (or Quit)"
         if (-not $NoBrowser) {
             Start-Process "http://localhost:$Port"
         }

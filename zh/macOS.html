@@ -1,19 +1,16 @@
 <br/>
 
-<h4>点击<a href="https://gfw.lomorage.com/https://github.com/lomorage/LomoAgentOSX/releases/download/2023_04_08.08_09_46.0.e09e855/LomoAgent.dmg">这里</a>下载"Lomorage照片助手"</h4>
+<h4>打开"终端"（不需要管理员密码），执行：</h4>
 
 <br/>
-<p>下载安装完后，启动应用，设置好存储目录，然后等待应用状态栏的状态成绿色。</p>
+<code style="display:inline-block; margin-top:4px; padding:4px 8px; background:#f4f4f4; border-radius:4px;">curl -fsSL https://lomosw.lomorage.com/mac/install.sh | LOMOD_CHINA=1 bash</code>
 
-<br/>
-<img style="max-width:100%; object-fit: contain;" src="assets/images/LomoAgentOSX.png" alt="设置存储目录">
-<img style="max-width:100%; object-fit: contain;" src="assets/images/LomoAgentOSXStatus.png" alt="应用状态栏">
+<br/><br/>
+<p>这会把"Lomorage"自动安装到你的用户目录下并启动——没有 .dmg 安装包，不需要重启电脑。菜单栏和 <code>~/Applications</code>（可以用 Spotlight/Launchpad 找到）都会出现"Lomorage"图标，随时可以从这两个地方打开它。</p>
+
+<p>更多细节（自定义数据目录、手机访问、卸载等）请参考<a href="https://docs.lomorage.com/zh/docs/Installation/lomorage-service/installation-osx/">完整安装文档</a>。</p>
 
 <hr/>
 <p style="font-size:0.9em; color:#666;">
-  <strong>高级选项：</strong>喜欢用命令行？打开"终端"并运行：
-  <br/>
-  <code style="display:inline-block; margin-top:4px; padding:4px 8px; background:#f4f4f4; border-radius:4px;">curl -fsSL https://lomosw.lomorage.com/mac/install.sh | LOMOD_CHINA=1 bash</code>
-  <br/>
-  这将只安装 lomod 后端服务（无图形界面）到你的用户目录下，无需管理员权限。下载安装包时会走 gfw.lomorage.com 加速代理。
+  <strong>其他选择：</strong>更喜欢传统的图形化安装向导？<a href="https://gfw.lomorage.com/https://github.com/lomorage/LomoAgentOSX/releases/download/2023_04_08.08_09_46.0.e09e855/LomoAgent.dmg">下载 DMG 安装包</a>。
 </p>

@@ -129,8 +129,15 @@ stop_existing_lomod() {
     if [[ -x "${stop_script}" ]]; then
         step "Stopping any running lomod"
         "${stop_script}" || true
-        sleep 1
     fi
+    # Also stop any running tray -- lomorage-stop.sh only kills lomod, but the tray process
+    # itself has no logic to notice its lomod died and restart it. Left alive across a
+    # reinstall, the NEW instance register_autostart is about to launch would see the OLD tray
+    # still matching its singleton-guard pgrep and exit immediately assuming it's redundant,
+    # even though the lomod it was supposed to be minding just got killed out from under it --
+    # leaving nothing running at all. Matches "safe to re-run" for the tray, not just lomod.
+    pkill -f "lomorage-tray.js ${INSTALL_DIR}" 2>/dev/null || true
+    sleep 1
 }
 
 # Installs the Lomorage.app wrapper (shipped as a static template inside the release tarball,

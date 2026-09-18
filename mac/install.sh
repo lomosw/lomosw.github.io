@@ -9,13 +9,11 @@
 # This is a secondary, advanced/CLI install path -- mirrors installers/windows/install.ps1.
 # The primary recommended macOS install is still the LomoAgent GUI installer (LomoAgentOSX,
 # see en/mac.html on lomosw.github.io); this script installs the bare lomod backend, with no
-# GUI onboarding, for users who'd rather script it. It does come with a menu bar icon
-# (lomorage-tray.js, a JXA/osascript script -- see its own header comment) mirroring the
-# Windows installer's system tray icon, for open/start/stop/restart/reset without a terminal --
-# plus a tiny Lomorage.app wrapper installed to ~/Applications (see its
-# Contents/MacOS/lomorage-launcher header comment) so a non-technical user who quits the tray
-# can find and reopen it via Spotlight/Launchpad like any normal Mac app, rather than needing
-# Terminal or a reboot.
+# GUI onboarding, for users who'd rather script it. It does come with Lomorage.app, a menu bar
+# icon (see its Contents/MacOS/lomorage-tray.swift header comment) mirroring the Windows
+# installer's system tray icon, for open/start/stop/restart/reset without a terminal --
+# installed to ~/Applications so a non-technical user who quits the tray can find and reopen it
+# via Spotlight/Launchpad like any normal Mac app, rather than needing Terminal or a reboot.
 #
 # Everything here runs at the current user's permission level -- no sudo, no admin rights, no
 # system LaunchDaemon. It installs into ~/Library/Application Support, autostarts via a
@@ -136,17 +134,17 @@ stop_existing_lomod() {
     # still matching its singleton-guard pgrep and exit immediately assuming it's redundant,
     # even though the lomod it was supposed to be minding just got killed out from under it --
     # leaving nothing running at all. Matches "safe to re-run" for the tray, not just lomod.
-    pkill -f "lomorage-tray.js ${INSTALL_DIR}" 2>/dev/null || true
+    pkill -f "${APP_PATH}/Contents/MacOS/lomorage-launcher" 2>/dev/null || true
     sleep 1
 }
 
 # Installs the Lomorage.app wrapper (shipped as a static template inside the release tarball,
-# see its Contents/MacOS/lomorage-launcher header comment) into ~/Applications so it's
+# see its Contents/MacOS/lomorage-tray.swift header comment) into ~/Applications so it's
 # findable via Spotlight/Launchpad/Finder, then points it at this INSTALL_DIR via
 # install-dir.txt -- the app bundle itself never embeds a copy of the actual tray logic, so it
-# doesn't need reinstalling on every lomod update, only when the launcher shim itself changes.
-# Returns non-zero (caller falls back to launching lomorage-tray.js directly) if the release
-# tarball didn't include the template, e.g. an older release.
+# doesn't need reinstalling on every lomod update, only when the compiled binary itself
+# changes. Returns non-zero (caller falls back to starting lomod directly, headless) if the
+# release tarball didn't include the template, e.g. an older release.
 install_app_bundle() {
     local template="${INSTALL_DIR}/Lomorage.app"
     if [[ ! -d "${template}" ]]; then
@@ -164,20 +162,13 @@ install_app_bundle() {
 
 register_autostart() {
     mkdir -p "$(dirname "${PLIST_PATH}")"
-    # Prefer launching the Lomorage.app wrapper (which starts lomod itself on launch, via
-    # lomorage-tray.js -- see its header comment) so a single autostart entry brings back the
-    # server, the menu bar icon, AND a normal double-click-to-reopen Mac app; fall back to the
-    # bare tray script, then to starting lomod directly headless, if either is missing (e.g. an
-    # older release tarball extracted over a partial/interrupted install).
+    # Prefer launching the Lomorage.app wrapper (which starts lomod itself on launch -- see
+    # lomorage-tray.swift's header comment) so a single autostart entry brings back the server,
+    # the menu bar icon, AND a normal double-click-to-reopen Mac app; fall back to starting
+    # lomod directly, headless, if the app bundle is missing (e.g. an older release tarball
+    # extracted over a partial/interrupted install).
     if [[ -x "${APP_PATH}/Contents/MacOS/lomorage-launcher" ]]; then
         PROGRAM_ARGUMENTS="<string>${APP_PATH}/Contents/MacOS/lomorage-launcher</string>"
-        PROCESS_TYPE="Interactive"
-    elif [[ -f "${INSTALL_DIR}/lomorage-tray.js" ]]; then
-        PROGRAM_ARGUMENTS="<string>/usr/bin/osascript</string>
-        <string>-l</string>
-        <string>JavaScript</string>
-        <string>${INSTALL_DIR}/lomorage-tray.js</string>
-        <string>${INSTALL_DIR}</string>"
         PROCESS_TYPE="Interactive"
     else
         PROGRAM_ARGUMENTS="<string>${INSTALL_DIR}/lomorage-start.sh</string>"
@@ -280,7 +271,6 @@ rm -rf "${INSTALL_DIR}"
 mkdir -p "${INSTALL_DIR}"
 tar -xzf "${TMP_TARBALL}" -C "${INSTALL_DIR}"
 chmod +x "${INSTALL_DIR}/lomod" "${INSTALL_DIR}/lomorage-start.sh" "${INSTALL_DIR}/lomorage-stop.sh"
-[[ -f "${INSTALL_DIR}/lomorage-tray.js" ]] && chmod +x "${INSTALL_DIR}/lomorage-tray.js"
 
 printf '%s' "${PLATFORM_VERSION}" > "${INSTALL_DIR}/version.txt"
 
@@ -304,8 +294,6 @@ if wait_for_lomod; then
     if [[ -x "${APP_PATH}/Contents/MacOS/lomorage-launcher" ]]; then
         echo "  a Lomorage icon is in the menu bar -- use it to open/stop/restart/reset"
         echo "  quit it by accident? reopen \"Lomorage\" from Spotlight, Launchpad, or ~/Applications"
-    elif [[ -f "${INSTALL_DIR}/lomorage-tray.js" ]]; then
-        echo "  a Lomorage icon is in the menu bar -- use it to open/stop/restart/reset"
     else
         echo "  to stop it, run: ${INSTALL_DIR}/lomorage-stop.sh"
     fi
